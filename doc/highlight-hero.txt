@@ -1,0 +1,237 @@
+*vim-highlight-hero* Highlights words, visual selection; on the fly or permanent
+
+Author: Boris Brodski <brodsky_boris@yahoo.com>
+License: Same terms as Vim itself (see |license|)
+
+
+INTRODUCTION                                    *highlight-hero*
+
+The |highlight-hero| highlights multiple words and visual selections.
+It is particularly useful for
+
+- spotting typos
+- finding variable usages
+- resolving merge conflicts (see |highlight-hero-merge-conflicts|)
+
+Quick start  >>  :HHauto or :HH, :1HH!, ...
+
+
+COMMANDS                                        *highlight-hero-commands*
+
+These commands are local to the buffers in which they work.
+
+                                                *highlight-hero-:HighlightHeroAuto*
+                                                *highlight-hero-:HHauto*
+:HighlightHeroAuto             Toggle highlighting of the word under the cursor
+:HHauto                        or visual selection. The case sensitivity
+                               is controlled by
+                               - |g:highlight_hero_ignorecase_strong|
+                               - |b:highlight_hero_ignorecase_strong|
+
+                               See |g:highlight_hero_smart_spaces| for
+                               multiline smart highlighting.
+
+
+                                                *highlight-hero-:HighlightHero*
+                                                *highlight-hero-:HH*
+                                                *highlight-hero-<leader>hh*
+:[count]HighlightHero [text]   Highlight current word, current visual selection
+:[count]HH [text]              or [text] using style (|highlight-groups|) [count]
+[count]<leader>hh              or 0, if [count] is omitted. The word or selected
+                               text get matched using word boundaries and
+                               case sensitive.
+
+                               Example: Select "abc" and press <leader>hh.
+                               In text "a abc aBc abcd" only "abc" get
+                               highlighted.
+
+
+                                                *highlight-hero-:HighlightHero!*
+                                                *highlight-hero-:HH!*
+:[count]HighlightHero! [text]  Same as :HighlightHero, but the matching
+:[count]HH! [text]             happens case insensitive and without considering 
+[count]<leader>HH              word boundaries.
+
+                               Example: Select "abc" and press <leader>HH.
+                               In text "a abc aBc abcd" will be highlighted:
+                                - "abc"
+                                - "aBc"
+                                - "[abc]d" ("abc" part of "abcd")
+
+
+
+                                                *highlight-hero-:HighlightHeroOff*
+                                                *highlight-hero-:HHoff*
+:[count]HighlightHeroOff       Turn off the highlight of the group [count].
+:[count]HHoff                  Default group 0.
+[count]<leader>ho
+
+                                                *highlight-hero-:HighlightHeroOff!*
+                                                *highlight-hero-:HHoff!*
+:HighlightHeroOff!             Turn off all highlighting groups.
+:HHoff!
+<leader>hO
+
+                                                *highlight-hero-:HighlightHeroPrint*
+                                                *highlight-hero-:HHprint*
+:HighlightHeroPrint            Print all colors in dark and light modes
+:HHprint
+
+
+MAPS                                            *highlight-hero-maps*
+
+                                                *highlight-hero-<leader>hh*
+[count]<leader>hh              Highlight current word or current visual selection
+
+                               Same as :[count]HighlightHero
+                               (strong matching, see |highlight-hero-configuration|)
+
+
+                                                *highlight-hero-<leader>HH*
+[count]<leader>HH              Highlight current word or current visual selection
+
+                               Same as :[count]HighlightHero!
+                               (weak matching, see |highlight-hero-configuration|)
+
+
+                                                *highlight-hero-<leader>ho*
+[count]<leader>ho              Turn off the highlight of the group [count].
+                               Same as :[count]HighlightHeroOff!
+
+
+                                                *highlight-hero-<leader>hO
+<leader>hO                     Turn off all highlighting groups.
+
+
+CASE SENSITIVITY                                *highlight-hero-case-sensitivity*
+
+There are strong and weak case sensitivity configurations in HighlightHero.
+
+1. Strong sensitivity   Used when word boundaries are respected:
+                        - word under cursor highlighting
+                        - |:HH| (and aliases)
+
+                        Controlled by |g:highlight_hero_ignorecase_strong|
+
+
+2. Weak sensitivity     Used when word boundaries are NOT respected:
+                        - |:HH!| (and aliases)
+
+                        Controlled by |g:highlight_hero_ignorecase_weak|
+
+
+
+RESOLVE MERGE CONFLICTS                         *highlight-hero-merge-conflicts*
+
+Suppose the following merge conflict arises and should be dealt with.
+
+   1   function test() {
+   2   <<<<<<< ours
+   3     if (condition1) {
+   4       print("Testing")
+   5   ||||||| base
+   6       if (condition1) {
+   7         print("TestIng")
+   8   =======
+   9     if (condition1) {
+  10       print("TestIng ")
+  11   >>>>>>> theirs
+  12     }
+  13   }
+
+First of all it is important to figure out, which lines have changed
+and at which positions. Here are the steps:
+
+- turn on the |:HHauto| feature
+- make sure, |g:highlight_hero_smart_spaces| is on
+- go to the line 3
+- press Shift+V
+
+   1   function test() {
+   2   <<<<<<< ours
+   3     if (condition1) {           <= HIGHLIGHTED
+   4       print("Testing")
+   5   ||||||| base
+   6       if (condition1) {         <= HIGHLIGHTED
+   7         print("TestIng")
+   8   =======
+   9     if (condition1) {           <= HIGHLIGHTED
+  10       print("TestIng ")
+  11   >>>>>>> theirs
+  12     }
+  13   }
+
+Dispite different indentation, all the "if (...) {" lines get highlighted
+(lines 3, 6, 9). This means, that no changes besides indentation was
+introduced to this line.
+
+Then, the second line in the block should be investigated. Selecting the
+entire line 4 with Shift+V reveals, that there are some differences, because
+this time lines 7 and 10 doesn't get highlighted. The positions of
+the introduced changes can be found as following:
+
+- place the cursor on the beginning of the line 7
+- press v
+- start moving the curser to the left and watch the highlighting
+  of the "ours" and "thiers" parts.
+
+The highlighting disappears on the first unmatched character.
+
+
+CONFIGURATION                                   *highlight-hero-configuration*
+
+                                                *g:highlight_hero_smart_spaces*
+g:highlight_hero_smart_spaces        (global) Ignore indentation and training
+                                     whitespaces in multi-line visual selection.
+                                     
+                                     Useful for merge conflicts.
+                                     See |highlight-hero-merge-conflicts|.
+
+
+                                                *g:highlight_hero_ignorecase_strong*
+g:highlight_hero_ignorecase_strong   (global) Case sensitivity for 
+                                     - word under cursor highlighting
+                                       (normal and visual modes)
+                                     - |:HH| (and aliases)
+
+                                     Possible values:
+                                     - 0 (case sensitive)
+                                     - 1 (case insensitive)
+                                     - & (use &ignorecase setting)
+                                     - && (use inverted &smartcase setting)
+
+                                     Default: && (inverted &smartcase setting)
+
+
+                                                *b:highlight_hero_ignorecase_strong*
+b:highlight_hero_ignorecase_strong   Same as |g:highlight_hero_ignorecase_strong|
+                                     but local to the buffer
+
+
+g:highlight_hero_ignorecase_weak     (global) Case sensitivity for 
+                                     - |:HH!| (and aliases)
+
+                                     Possible values:
+                                     - 0 (case sensitive)
+                                     - 1 (case insensitive)
+                                     - & (use &ignorecase setting for the buffer)
+                                     - && (use inverted &smartcase setting)
+                                
+                                     Default: 1 (case insensitive)
+
+DEBUG                                           *highlight-hero-debug*
+
+                                                *b:highlight_hero_ignorecase_weak*
+b:highlight_hero_ignorecase_weak     Same as |g:highlight_hero_ignorecase_weak|
+                                     but local to the buffer
+
+
+g:highlight_hero_debug               if set to 1 the matching pattern get
+                                     copied to the 'a' register.
+
+g:highlight_hero_match_id_offset     the first highlight id for 10 groups (0..9)
+g:highlight_hero_match_id_current    the highlight id for the highlighting of
+                                     the current word and visual selection
+
+
+vim:tw=78:et:ft=help:norl:
