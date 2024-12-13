@@ -273,8 +273,8 @@ command! -bar                         HighlightHeroAuto   call s:highlight_curre
 command! -bar                         HHauto              call s:highlight_current_toggle()
 command! -bar -bang -count=0 -nargs=? HighlightHero       call s:highlight(<count>, "<bang>", 0, "<args>")
 command! -bar -bang -count=0 -nargs=? HH                  call s:highlight(<count>, "<bang>", 0, "<args>")
-command! -bar -bang -count=0 -nargs=0 HighlightHeroOff    call s:highlight_off_cmd(v:count, "<bang>")
-command! -bar -bang -count=0 -nargs=0 HHoff               call s:highlight_off_cmd(v:count, "<bang>")
+command! -bar -bang -count=0 -nargs=0 HighlightHeroOff    call s:highlight_off_cmd(<count>, "<bang>")
+command! -bar -bang -count=0 -nargs=0 HHoff               call s:highlight_off_cmd(<count>, "<bang>")
 command!                              HighlightHeroPrint  call s:highlight_hero_print()
 command!                              HHprint             call s:highlight_hero_print()
 
