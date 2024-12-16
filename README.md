@@ -1,3 +1,5 @@
+**FOR NeoVim SEE**: https://github.com/borisbrodski/neonvim-highlight-hero
+
 # vim-highlight-hero
 
 The highlight-hero highlights multiple words and visual selections. On the fly and statically.
